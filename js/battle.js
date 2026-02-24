@@ -27,8 +27,30 @@ let battleState = {
   timerInterval: null,
   hasAnswered: false,
   sessionId: null,
-  nextQuestionTimeout: null
+  nextQuestionTimeout: null,
+  previousHostHp: 100,
+  previousGuestHp: 100,
+  hasPlayedEndSound: false
 };
+
+// ===== Sound System =====
+const BATTLESOUNDS = {
+  wrong: new Audio('wrong_kub.mp3'),
+  hit: new Audio('hp_down.mp3'),
+  win: new Audio('win_sound.mp3'),
+  lose: new Audio('lose_sound.mp3')
+};
+
+
+function playBattleSound(name) {
+  if (BATTLESOUNDS[name]) {
+    const audio = BATTLESOUNDS[name];
+    audio.currentTime = 0;
+    audio.volume = 1.0; // เพิ่มระดับเสียงให้ดังขึ้นตามที่ผู้ใช้ต้องการ
+    audio.play().catch(e => console.error("Sound play failed:", e));
+  }
+}
+
 
 // ===== Helpers =====
 function getQuestionsByTopic(topic) {
@@ -200,6 +222,9 @@ function cleanupBattle() {
     battleState.timerInterval = null;
   }
   battleState.hasAnswered = false;
+  battleState.previousHostHp = BATTLE_CONFIG.MAX_HEALTH;
+  battleState.previousGuestHp = BATTLE_CONFIG.MAX_HEALTH;
+  battleState.hasPlayedEndSound = false;
 }
 
 // ===== Join Room =====
@@ -316,8 +341,9 @@ function showWaitingScreen(room) {
 function showBattleScreen(room) {
   showScreen('battleArena');
   document.getElementById('arenaTopic').textContent = getTopicLabel(room.topic);
-  document.getElementById('hostDisplayName').textContent = room.hostName || 'Host';
-  document.getElementById('guestDisplayName').textContent = room.guestName || 'Guest';
+  const role = battleState.role;
+  document.getElementById('hostDisplayName').textContent = room.hostName + (role === 'host' ? ' (You)' : '');
+  document.getElementById('guestDisplayName').textContent = (room.guestName || 'Guest') + (role === 'guest' ? ' (You)' : '');
   updateHealthBars(room.hostHealth, room.guestHealth);
 
   // Ensure total questions count is always correct
@@ -354,11 +380,48 @@ function showBattleScreen(room) {
 function updateHealthBars(hostHp, guestHp) {
   const h = Math.max(0, hostHp);
   const g = Math.max(0, guestHp);
-  document.getElementById('hostHealth').textContent = h;
+
+  // คำนวณความต่างเพื่อแสดง Damage Popup
+  if (h < battleState.previousHostHp) {
+    showDamagePopup('host', battleState.previousHostHp - h);
+    playBattleSound('hit');
+  }
+  if (g < battleState.previousGuestHp) {
+    showDamagePopup('guest', battleState.previousGuestHp - g);
+    playBattleSound('hit');
+  }
+
+  // อัปเดตค่าเลือกล่าสุด
+  battleState.previousHostHp = h;
+  battleState.previousGuestHp = g;
+
+  document.getElementById('hostHealth').textContent = Math.floor(h);
   document.getElementById('hostHealthBar').style.width = h + '%';
-  document.getElementById('guestHealth').textContent = g;
+  document.getElementById('hostHealthGhost').style.width = h + '%';
+
+  document.getElementById('guestHealth').textContent = Math.floor(g);
   document.getElementById('guestHealthBar').style.width = g + '%';
+  document.getElementById('guestHealthGhost').style.width = g + '%';
 }
+
+function showDamagePopup(target, amount) {
+  const container = document.getElementById(`${target}DamageContainer`);
+  if (!container) return;
+
+  const popup = document.createElement('div');
+  popup.className = 'damage-number';
+  popup.textContent = `-${Math.round(amount)}`;
+
+  // สุ่มตำแหน่งเล็กน้อยเพื่อให้ดูมีมิติ
+  const randomX = (Math.random() - 0.5) * 40;
+  popup.style.left = `calc(50% + ${randomX}px)`;
+
+  container.appendChild(popup);
+
+  // ลบออกเมื่ออนิเมชันจบ
+  setTimeout(() => popup.remove(), 800);
+}
+
 
 // ป้องกัน ghost click บน mobile — เก็บเวลาที่ render options ล่าสุด
 let _optionsRenderTime = 0;
@@ -438,7 +501,18 @@ async function submitBattleAnswer(answerIndex, qIndex) {
   // committed = true หมายความว่า transaction ของเราชนะ (คนแรกที่ตอบ)
   if (txResult.committed) {
     const room = txResult.snapshot.val();
-    if (room) await resolveRound(room);
+    if (room) {
+      // เล่นคำเตือนว่าตอบถูกหรือผิด
+      const q = toArray(room.questions)[qIndex];
+      if (q) {
+        const myAns = role === 'host' ? room.hostAnswer : room.guestAnswer;
+        if (myAns) {
+          if (myAns.index === q.correct) playBattleSound('correct');
+          // ลบเสียง wrong ออกตามคำขอ (เหลือแค่เสียงเดเมจใน resolveRound -> updateHealthBars)
+        }
+      }
+      await resolveRound(room);
+    }
   }
 }
 
@@ -563,12 +637,20 @@ function showGameOver(room) {
       const myHp = battleState.role === 'host' ? room.hostHealth : room.guestHealth;
       title.textContent = '🎉 คุณชนะ!';
       title.classList.add('win');
+      if (!battleState.hasPlayedEndSound) {
+        playBattleSound('win');
+        battleState.hasPlayedEndSound = true;
+      }
       msg.innerHTML = `<strong>${myName}</strong> เอาชนะ <strong>${opponentName}</strong> ได้!<br><span style="opacity:.7">HP เหลือ ${Math.max(0, myHp)} — เยี่ยมมาก!</span>`;
       saveMatchResult(myName, myHp);
     } else {
       const winnerName = winner === 'host' ? room.hostName : room.guestName;
       title.textContent = '💀 คุณแพ้!';
       title.classList.add('lose');
+      if (!battleState.hasPlayedEndSound) {
+        playBattleSound('lose');
+        battleState.hasPlayedEndSound = true;
+      }
       msg.innerHTML = `<strong>${winnerName}</strong> ชนะในครั้งนี้<br><span style="opacity:.7">สู้ต่อไป ${myName}!</span>`;
     }
   }
@@ -642,8 +724,9 @@ async function performActualRematch(room) {
 
   // รีเซ็ตสถานะหน้าเครื่องตัวเองด้วย
   battleState.hasAnswered = false;
-  if (battleState.timerInterval) clearInterval(battleState.timerInterval);
   battleState.timerInterval = null;
+  battleState.previousHostHp = BATTLE_CONFIG.MAX_HEALTH;
+  battleState.previousGuestHp = BATTLE_CONFIG.MAX_HEALTH;
 
   try {
     const questions = getQuestionsByTopic(topic);

@@ -8,10 +8,19 @@ let incidentScore = 0;
 let certScore = 0;
 let vocabScore = 0;
 
-// ===== Shuffled Data State =====
-let shuffledVocab = [];
-let shuffledIncidents = [];
-let shuffledCert = [];
+// ===== Sound System =====
+const SOLOSOUNDS = {
+  correct: new Audio('correct kub.mp3'),
+  wrong: new Audio('wrong_kub.mp3')
+};
+
+function playSoloSound(name) {
+  if (SOLOSOUNDS[name]) {
+    SOLOSOUNDS[name].currentTime = 0;
+    SOLOSOUNDS[name].play().catch(() => { });
+  }
+}
+
 
 // ===== Helpers (Utility) =====
 function shuffleArray(arr) {
@@ -43,7 +52,27 @@ document.addEventListener('DOMContentLoaded', () => {
   initCertification();
   initGamification();
   initNav();
+  initBackButtons();
+  initPrevButtons();
 });
+
+function initPrevButtons() {
+  document.getElementById('prevVocabQuestion')?.addEventListener('click', prevVocabQuestion);
+  document.getElementById('prevIncident')?.addEventListener('click', prevIncident);
+  document.getElementById('prevQuestion')?.addEventListener('click', prevQuestion);
+}
+
+
+function initBackButtons() {
+  document.querySelectorAll('.btn-back-solo').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // ใช้ goToPage จาก initPageNavigation (ต้องทำให้เข้าถึงได้)
+      const pageId = btn.dataset.page || 'home';
+      const homeTab = document.querySelector('.nav-tab[data-page="home"]');
+      if (homeTab) homeTab.click();
+    });
+  });
+}
 
 // ===== Page / Tab Navigation =====
 function initPageNavigation() {
@@ -129,13 +158,30 @@ function submitVocabAnswer() {
     if (i === q.correct) o.classList.add('correct');
     else if (i === idx && !isCorrect) o.classList.add('wrong');
   });
-  if (isCorrect) vocabScore += 10;
+  if (isCorrect) {
+    vocabScore += 10;
+    playSound('correct');
+    selected.classList.add('feedback-correct');
+    setTimeout(() => selected.classList.remove('feedback-correct'), 500);
+  } else {
+    playSound('wrong');
+    selected.classList.add('feedback-wrong');
+    setTimeout(() => selected.classList.remove('feedback-wrong'), 500);
+  }
 }
+
+function playSound(name) { playSoloSound(name); }
 
 function nextVocabQuestion() {
   const questions = getVocabQuestions();
   const next = (vocabIndex + 1) % questions.length;
   showVocabQuestion(next);
+}
+
+function prevVocabQuestion() {
+  const questions = getVocabQuestions();
+  const prev = (vocabIndex - 1 + questions.length) % questions.length;
+  showVocabQuestion(prev);
 }
 
 
@@ -169,7 +215,18 @@ function handleDecision(choice) {
   const isCorrect = choice === inc.correct;
   feedback.classList.add('show', isCorrect ? 'correct' : 'wrong');
   feedback.innerHTML = `<strong>${isCorrect ? '✓ ถูกต้อง!' : '✗ ยังไม่ตรง'}</strong><br>${inc.explanation}`;
-  if (isCorrect) incidentScore += 10;
+  if (isCorrect) {
+    incidentScore += 10;
+    playSound('correct');
+    const btnId = choice === 'escalate' ? 'btnEscalate' : 'btnIgnore';
+    document.getElementById(btnId)?.classList.add('feedback-correct');
+    setTimeout(() => document.getElementById(btnId)?.classList.remove('feedback-correct'), 500);
+  } else {
+    playSound('wrong');
+    const btnId = choice === 'escalate' ? 'btnEscalate' : 'btnIgnore';
+    document.getElementById(btnId)?.classList.add('feedback-wrong');
+    setTimeout(() => document.getElementById(btnId)?.classList.remove('feedback-wrong'), 500);
+  }
   document.getElementById('btnEscalate').disabled = true;
   document.getElementById('btnIgnore').disabled = true;
 }
@@ -177,6 +234,11 @@ function handleDecision(choice) {
 function nextIncident() {
   const next = (incidentIndex + 1) % shuffledIncidents.length;
   showIncident(next);
+}
+
+function prevIncident() {
+  const prev = (incidentIndex - 1 + shuffledIncidents.length) % shuffledIncidents.length;
+  showIncident(prev);
 }
 
 // ===== Certification =====
@@ -248,13 +310,28 @@ function submitAnswer() {
     if (i === q.correct) o.classList.add('correct');
     else if (i === idx && !isCorrect) o.classList.add('wrong');
   });
-  if (isCorrect) certScore += 10;
+  if (isCorrect) {
+    certScore += 10;
+    playSound('correct');
+    selected.classList.add('feedback-correct');
+    setTimeout(() => selected.classList.remove('feedback-correct'), 500);
+  } else {
+    playSound('wrong');
+    selected.classList.add('feedback-wrong');
+    setTimeout(() => selected.classList.remove('feedback-wrong'), 500);
+  }
 }
 
 function nextQuestion() {
   const questions = getCertQuestions();
   const next = (certIndex + 1) % questions.length;
   showQuestion(next);
+}
+
+function prevQuestion() {
+  const questions = getCertQuestions();
+  const prev = (certIndex - 1 + questions.length) % questions.length;
+  showQuestion(prev);
 }
 
 // ===== Gamification =====
