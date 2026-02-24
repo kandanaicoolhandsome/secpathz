@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecPathz - A Cybersecurity Knowledge Framework</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <a href="#" class="nav-brand" id="navBrand">🛡️ SecPathz</a>
+    <ul class="nav-links main-tabs">
+      <li><button class="nav-tab active" data-page="home">Home</button></li>
+      <li><button class="nav-tab" data-page="vocabulary">Terminology</button></li>
+      <li><button class="nav-tab" data-page="incidents">Incident Scenarios</button></li>
+      <li><button class="nav-tab" data-page="cert">Certification Prep</button></li>
+      <li><button class="nav-tab" data-page="gamification">Battle!</button></li>
+    </ul>
+    <div id="rejoinBanner"
+      style="display:none; position:fixed; bottom:20px; right:20px; background:var(--bg-card); border:1px solid var(--accent); padding:15px; border-radius:12px; box-shadow:var(--shadow-lg); z-index:9999; animation: slideUp 0.5s ease;">
+      <p style="margin:0 0 10px 0; font-size:0.9rem;">🎮 มีเกมที่ค้างอยู่!</p>
+      <button class="btn btn-primary btn-sm" id="btnRejoin"
+        style="padding:5px 10px; font-size:0.8rem;">กลับเข้าห้อง</button>
+      <button class="btn btn-secondary btn-sm" id="btnDismissRejoin"
+        style="padding:5px 10px; font-size:0.8rem; margin-left:5px;">เพิกเฉย</button>
+    </div>
+    <button class="nav-toggle" aria-label="เมนู">☰</button>
+  </nav>
+
+  <main class="main-content">
+    <!-- Home Page -->
+    <section id="page-home" class="page active">
+      <header class="hero">
+        <h1>SecPathz</h1>
+        <p class="hero-subtitle">Your Ultimate Gateway to the SOC Frontier</p>
+        <div class="home-modules">
+          <button class="module-card" data-page="vocabulary">
+            <span class="module-icon">📚</span>
+            <span class="module-title">Terminology</span>
+            <span class="module-desc">Technical glossary and basics</span>
+          </button>
+          <button class="module-card" data-page="incidents">
+            <span class="module-icon">🚨</span>
+            <span class="module-title">Incident Scenarios</span>
+            <span class="module-desc">Triage incidents and make decisions</span>
+          </button>
+          <button class="module-card" data-page="cert">
+            <span class="module-icon">📜</span>
+            <span class="module-title">Certification Prep</span>
+            <span class="module-desc">ISC2 CC & Security+ practice</span>
+          </button>
+          <button class="module-card" data-page="gamification">
+            <span class="module-icon">🏆</span>
+            <span class="module-title">Battle Mode</span>
+            <span class="module-desc">Real-time multiplayer competition</span>
+          </button>
+        </div>
+      </header>
+    </section>
+
+    <!-- 1. Terminology (Quiz) -->
+    <section id="page-vocabulary" class="page section">
+      <h2>📚 Terminology </h2>
+      <p class="section-desc">แบบทดสอบศัพท์เทคนิคพื้นฐานด้านความมั่นคงปลอดภัยไซเบอร์</p>
+      <div class="quiz-container vocab-quiz">
+        <div class="quiz-question" id="vocabQuestion"></div>
+        <div class="quiz-options" id="vocabOptions"></div>
+        <button class="btn btn-primary" id="submitVocabAnswer" style="display:none">ตรวจคำตอบ</button>
+        <div class="quiz-feedback" id="vocabFeedback"></div>
+        <div class="quiz-next-wrap">
+          <button class="btn btn-outline" id="nextVocabQuestion">ข้อถัดไป →</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- 3. Incident Scenarios -->
+    <section id="page-incidents" class="page section">
+      <h2>🚨 Incident Scenarios</h2>
+      <p class="section-desc">จำลองสถานการณ์จริง — ตัดสินใจเปิดเคสหรือเพิกเฉย</p>
+      <div class="incident-container">
+        <div class="incident-card" id="incidentCard">
+          <div class="incident-header">
+            <span class="incident-id">INC-001</span>
+            <span class="incident-time">🕐 00:47 น.</span>
+          </div>
+          <div class="incident-body" id="incidentBody"></div>
+          <div class="incident-actions">
+            <button class="btn btn-danger" id="btnEscalate">เปิดเคส (Escalate)</button>
+            <button class="btn btn-secondary" id="btnIgnore">เพิกเฉย (Ignore)</button>
+          </div>
+          <div class="incident-feedback" id="incidentFeedback"></div>
+        </div>
+        <div class="incident-next-wrap">
+          <button class="btn btn-outline" id="nextIncident">สถานการณ์ถัดไป →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Certification Preparation -->
+    <section id="page-cert" class="page section section-dark">
+      <h2>📜 Certification Preparation</h2>
+      <p class="section-desc">แนวข้อสอบ ISC2 CC, Security+ พร้อมเฉลยภาษาไทย</p>
+      <div class="cert-type-selector">
+        <button class="cert-type-btn active" data-cert-type="isc2cc">ISC2 CC</button>
+        <button class="cert-type-btn" data-cert-type="securityplus">Security+</button>
+      </div>
+      <div class="cert-container">
+        <div class="cert-question" id="certQuestion"></div>
+        <div class="cert-options" id="certOptions"></div>
+        <button class="btn btn-primary" id="submitAnswer" style="display:none">ตรวจคำตอบ</button>
+        <div class="quiz-feedback" id="certFeedback"></div>
+        <div class="quiz-next-wrap">
+          <button class="btn btn-outline" id="nextQuestion">ข้อถัดไป →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Gamification -->
+    <section id="page-gamification" class="page section">
+      <h2>🏆 Battle Arena</h2>
+      <p class="section-desc">Leaderboard & Real-time Global Competition</p>
+      <div class="gamification-tabs">
+        <button class="tab-btn active" data-tab="leaderboard">Leaderboard</button>
+        <button class="tab-btn" data-tab="battle">Battle Mode</button>
+      </div>
+      <div class="tab-content active" id="leaderboard">
+        <div class="leaderboard-header">
+          <span class="lb-info">🏆 อัปเดต Realtime — ชนะ Battle เพื่อขึ้นอันดับ</span>
+        </div>
+        <div class="leaderboard-list" id="leaderboardList"></div>
+      </div>
+      <div class="tab-content" id="battle">
+        <!-- Lobby: Create / Join -->
+        <div id="battleLobby" class="battle-lobby">
+          <div class="battle-player-name">
+            <label>ชื่อของคุณ</label>
+            <input type="text" id="battlePlayerNameInput" placeholder="ใส่ชื่อครั้งเดียว" maxlength="20">
+          </div>
+          <div class="battle-topic-select">
+            <h4>เลือกหัวข้อคำถาม</h4>
+            <div class="topic-buttons">
+              <button class="topic-btn" data-topic="isc2cc">ISC2 CC</button>
+              <button class="topic-btn" data-topic="securityplus">Security+</button>
+              <button class="topic-btn" data-topic="vocabulary">Terminology</button>
+              <button class="topic-btn" data-topic="incidents">Incident Scenarios</button>
+            </div>
+          </div>
+          <div class="battle-split">
+            <div class="battle-create">
+              <h4>สร้างห้อง</h4>
+              <button class="btn btn-primary" id="createRoom">Create Room</button>
+              <p class="room-code-display">Room Code: <strong id="roomCode">------</strong></p>
+            </div>
+            <div class="battle-join">
+              <h4>เข้าร่วมห้อง</h4>
+              <input type="text" id="joinRoomCode" placeholder="ใส่ Room Code" maxlength="6">
+              <button class="btn btn-secondary" id="joinRoom">Join Room</button>
+            </div>
+          </div>
+          <div class="battle-status" id="battleStatus"></div>
+        </div>
+        <!-- Waiting Room -->
+        <div id="battleWaiting" class="battle-waiting" style="display:none">
+          <div class="waiting-info">
+            <p>Room: <strong id="waitingRoomCode"></strong></p>
+            <p>หัวข้อ: <strong id="waitingTopic"></strong></p>
+            <p id="waitingPlayers"></p>
+            <p id="waitingStatus" class="waiting-status"></p>
+            <button class="btn btn-primary" id="btnReady">พร้อม</button>
+            <button class="btn btn-primary" id="btnStartGame" style="display:none">เริ่มเกม</button>
+            <div style="margin-top: 15px;">
+              <button class="btn btn-secondary" id="btnExitWaiting">ออกจากห้อง</button>
+            </div>
+          </div>
+        </div>
+        <!-- Battle Arena -->
+        <div id="battleArena" class="battle-arena" style="display:none">
+          <div class="arena-header" style="position:relative">
+            <span id="arenaTopic"></span>
+            <span class="arena-question-num">ข้อ <span id="questionNum">1</span> / <span
+                id="totalQuestions">20</span></span>
+            <button class="btn-surrender" id="btnSurrender">ยอมแพ้</button>
+          </div>
+          <div class="arena-characters">
+            <div class="character character-left">
+              <div class="char-avatar" id="charHost">🛡️</div>
+              <div class="char-name" id="hostDisplayName">Host</div>
+              <div class="health-bar">
+                <div class="health-fill" id="hostHealthBar" style="width:100%"></div>
+              </div>
+              <div class="health-text"><span id="hostHealth">100</span></div>
+            </div>
+            <div class="character character-right">
+              <div class="char-avatar" id="charGuest">🛡️</div>
+              <div class="char-name" id="guestDisplayName">Guest</div>
+              <div class="health-bar">
+                <div class="health-fill" id="guestHealthBar" style="width:100%"></div>
+              </div>
+              <div class="health-text"><span id="guestHealth">100</span></div>
+            </div>
+          </div>
+          <div class="arena-question">
+            <div class="arena-question-text" id="arenaQuestion"></div>
+            <div class="arena-timer" id="arenaTimer">15</div>
+            <div class="arena-options" id="arenaOptions"></div>
+          </div>
+          <div class="arena-result" id="arenaResult" style="display:none"></div>
+          <div class="arena-next-wrap">
+            <button class="btn btn-primary" id="btnNextQuestion" style="display:none">ข้อถัดไป</button>
+          </div>
+        </div>
+        <!-- Game Over -->
+        <div id="battleGameOver" class="battle-gameover" style="display:none">
+          <h3 id="gameOverTitle">ชนะ!</h3>
+          <p id="gameOverMessage"></p>
+          <div class="gameover-actions">
+            <button class="btn btn-primary" id="btnRematch" style="display:none">เล่นอีกครั้ง</button>
+            <button class="btn btn-secondary" id="btnBackToLobby">กลับหน้าหลัก</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>SecPathz - A Cybersecurity Knowledge Framework — Your Ultimate Gateway to the SOC Frontier</p>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/battle.js"></script>
+</body>
+
+</html>
