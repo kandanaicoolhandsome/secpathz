@@ -1,37 +1,3 @@
-// ===== Vocabulary Data =====
-const VOCABULARY = [
-  {
-    term: 'Phishing',
-    short: 'การหลอกลวงผ่านอีเมลหรือข้อความเพื่อขโมยข้อมูล',
-    full: 'Phishing คือเทคนิคการโจมตีทางไซเบอร์ที่ผู้โจมตีปลอมตัวเป็นองค์กรที่น่าเชื่อถือ (เช่น ธนาคาร, บริการอีเมล) เพื่อหลอกให้เหยื่อเปิดลิงก์หรือแนบไฟล์ที่เป็นมัลแวร์ หรือกรอกข้อมูลสำคัญ เช่น รหัสผ่าน, หมายเลขบัตรเครดิต'
-  },
-  {
-    term: 'Malware',
-    short: 'ซอฟต์แวร์ที่เป็นอันตรายต่อระบบ',
-    full: 'Malware (Malicious Software) คือโปรแกรมที่ออกแบบมาเพื่อสร้างความเสียหาย เช่น Virus, Worm, Trojan, Ransomware, Spyware แต่ละประเภทมีพฤติกรรมต่างกัน เช่น Ransomware จะเข้ารหัสไฟล์แล้วเรียกค่าไถ่'
-  },
-  {
-    term: 'SIEM',
-    short: 'ระบบรวบรวมและวิเคราะห์เหตุการณ์ความปลอดภัย',
-    full: 'SIEM (Security Information and Event Management) คือแพลตฟอร์มที่รวบรวม Log จากหลายแหล่ง (Firewall, IDS/IPS, Endpoint, Email) มา Correlate และวิเคราะห์เพื่อตรวจจับภัยคุกคามและตอบสนองต่อเหตุการณ์ความปลอดภัย'
-  },
-  {
-    term: 'IOC',
-    short: 'ตัวบ่งชี้การถูกบุกรุก',
-    full: 'IOC (Indicator of Compromise) คือหลักฐานที่บ่งบอกว่าระบบอาจถูกบุกรุก เช่น IP Address ที่เป็น malicious, Hash ของไฟล์มัลแวร์, Domain ที่ใช้ใน C2 (Command and Control), Pattern ใน Log ที่ผิดปกติ'
-  },
-  {
-    term: 'SOC',
-    short: 'ศูนย์ปฏิบัติการความปลอดภัย',
-    full: 'SOC (Security Operations Center) คือทีมที่รับผิดชอบการตรวจสอบและตอบสนองต่อเหตุการณ์ความปลอดภัย 24/7 งานหลักรวมถึง Monitoring Alerts, Incident Response, Threat Hunting, และการรายงาน'
-  },
-  {
-    term: 'EDR',
-    short: 'โซลูชันตรวจจับและตอบสนองระดับ Endpoint',
-    full: 'EDR (Endpoint Detection and Response) คือซอฟต์แวร์ที่ติดตั้งบน Endpoint (PC, Server) เพื่อเก็บและวิเคราะห์กิจกรรม เช่น Process, Network, File เพื่อตรวจจับและตอบสนองต่อภัยคุกคามขั้นสูง (APT)'
-  }
-];
-
 // ===== Incident Scenarios =====
 const INCIDENTS = [
   {
