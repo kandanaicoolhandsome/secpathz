@@ -22,7 +22,7 @@ const INCIDENTS = [
     explanation: 'การดาวน์โหลดและ Execute ไฟล์จากแหล่งที่ไม่รู้จักมีความเสี่ยงสูง อาจเป็น Malware หรือ Phishing — แม้จะเป็น IT ก็ควรตรวจสอบ'
   },
   {
-    id: 'INC-004',
+    id: 'INC-110',
     time: '09:00',
     scenario: 'Alert: Outbound connection ไปยัง IP ที่อยู่ใน Threat Intelligence Feed — แต่เป็น User ที่ทำงาน Remote จากต่างประเทศ (VPN) และ IP ปลายทางเป็น Office ของบริษัทในประเทศนั้น',
     correct: 'ignore',
